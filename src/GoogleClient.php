@@ -1,9 +1,10 @@
 <?php
+
 namespace Skn036\Google;
 
+use Illuminate\Support\Facades\Request;
 use Skn036\Google\Traits\Configurable;
 use Skn036\Google\Traits\TokenStorage;
-use Illuminate\Support\Facades\Request;
 
 class GoogleClient extends \Google_Client
 {
@@ -54,10 +55,8 @@ class GoogleClient extends \Google_Client
     /**
      * Create a new GoogleClient instance.
      *
-     * @param string|int|null $userId
-     *
+     * @param  string|int|null  $userId
      * @return void
-     *
      */
     public function __construct($userId = null)
     {
@@ -77,8 +76,7 @@ class GoogleClient extends \Google_Client
     /**
      * Set the user id. if not given
      *
-     * @param string|int|null $userId
-     *
+     * @param  string|int|null  $userId
      * @return string|int|null
      */
     private function setUserId($userId)
@@ -86,14 +84,14 @@ class GoogleClient extends \Google_Client
         if (empty($this->envConfig['credentials_per_user'])) {
             return null;
         }
+
         return $userId ?: auth()->id();
     }
 
     /**
      * set access token to the google client.
      *
-     * @param array<string, mixed>|null $token
-     *
+     * @param  array<string, mixed>|null  $token
      * @return void
      */
     protected function setToken($token)
@@ -105,8 +103,7 @@ class GoogleClient extends \Google_Client
     /**
      * set google user email
      *
-     * @param string|null $email
-     *
+     * @param  string|null  $email
      * @return void
      */
     protected function setEmail($email)
@@ -121,7 +118,7 @@ class GoogleClient extends \Google_Client
      */
     public function isAuthenticated()
     {
-        return !empty($this->token['access_token']) && !$this->isAccessTokenExpired();
+        return ! empty($this->token['access_token']) && ! $this->isAccessTokenExpired();
     }
 
     /**
@@ -131,7 +128,7 @@ class GoogleClient extends \Google_Client
      */
     public function refreshTokenIfNecessary()
     {
-        if (!empty($this->token['access_token']) && $this->isAccessTokenExpired()) {
+        if (! empty($this->token['access_token']) && $this->isAccessTokenExpired()) {
             $this->setToken($this->fetchAccessTokenWithRefreshToken());
             $this->writeTokenToStorage();
         }
@@ -188,20 +185,19 @@ class GoogleClient extends \Google_Client
     /**
      * authenticate the user with the google auth code
      *
-     * @param string|null $code
-     *
+     * @param  string|null  $code
      * @return void
      *
      * @throws \Exception
      */
     public function authenticate($code = null)
     {
-        if (!$code) {
+        if (! $code) {
             $request = Request::capture();
             $code = $request->input('code');
         }
 
-        if (!$code) {
+        if (! $code) {
             throw new \Exception('Google auth redirect code is not present in the request.');
         }
 
@@ -225,6 +221,7 @@ class GoogleClient extends \Google_Client
     {
         try {
             $service = new \Google_Service_Gmail($this);
+
             return $service->users->getProfile('me');
         } catch (\Exception $error) {
             return null;

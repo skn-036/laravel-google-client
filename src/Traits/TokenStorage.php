@@ -1,4 +1,5 @@
 <?php
+
 namespace Skn036\Google\Traits;
 
 use Illuminate\Support\Facades\Storage;
@@ -20,25 +21,24 @@ trait TokenStorage
     /**
      * Parse the json data from the file.
      *
-     * @param string $filePath
-     *
+     * @param  string  $filePath
      * @return array<string, mixed>|null
      */
     private function parseJsonDataFromFile($filePath)
     {
-        if (!$this->isCredentialsFileExists($filePath)) {
+        if (! $this->isCredentialsFileExists($filePath)) {
             return null;
         }
         $content = decrypt(Storage::disk('local')->get($filePath));
+
         return json_decode($content, true);
     }
 
     /**
      * Save the json data to the file.
      *
-     * @param string $filePath
-     * @param array<string, mixed> $data
-     *
+     * @param  string  $filePath
+     * @param  array<string, mixed>  $data
      * @return void
      */
     private function saveJsonDataToFile($filePath, $data)
@@ -50,15 +50,15 @@ trait TokenStorage
     /**
      * Delete the file.
      *
-     * @param string $filePath
-     *
+     * @param  string  $filePath
      * @return bool
      */
     private function deleteFile($filePath)
     {
-        if (!$this->isCredentialsFileExists($filePath)) {
+        if (! $this->isCredentialsFileExists($filePath)) {
             return true;
         }
+
         return Storage::disk('local')->delete($filePath);
     }
 }

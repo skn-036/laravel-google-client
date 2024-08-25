@@ -1,4 +1,5 @@
 <?php
+
 namespace Skn036\Google\Traits;
 
 trait Configurable
@@ -34,7 +35,7 @@ trait Configurable
         $config = app('config')['google'];
 
         foreach (['project_id', 'client_id', 'client_secret', 'redirect_uri', 'scopes'] as $key) {
-            if (!$this->isConfigValueAvailable($config, $key)) {
+            if (! $this->isConfigValueAvailable($config, $key)) {
                 throw new \Exception("Google $key is not set on the env file.");
             }
         }
@@ -45,8 +46,7 @@ trait Configurable
     /**
      * Set the configuration of the from env file.
      *
-     * @param array<string, mixed> $envConfig
-     *
+     * @param  array<string, mixed>  $envConfig
      * @return array<string, mixed>
      */
     protected function prepareGoogleConfig($envConfig)
@@ -68,38 +68,37 @@ trait Configurable
     /**
      * Check if a configuration key exists.
      *
-     * @param array<string, mixed> $config
-     * @param string|callable $key
-     *
+     * @param  array<string, mixed>  $config
+     * @param  string|callable  $key
      * @return bool
-     *
      */
     private function isConfigValueAvailable($config, $key)
     {
         if (is_callable($key)) {
             return $key($config);
         }
-        return !empty($config[$key]);
+
+        return ! empty($config[$key]);
     }
 
     /**
      * Set the credentials file path.
      *
-     * @param array<string, mixed> $envConfig
-     * @param string|int|null $userId
-     *
+     * @param  array<string, mixed>  $envConfig
+     * @param  string|int|null  $userId
      * @return string
      */
     private function setCredentialsFilePath($envConfig, $userId)
     {
-        if (empty($envConfig['credentials_per_user']) || !$userId) {
-            return $this->credentialsPathPrefix . '/' . $this->credentialsFilePrefix . '.json';
+        if (empty($envConfig['credentials_per_user']) || ! $userId) {
+            return $this->credentialsPathPrefix.'/'.$this->credentialsFilePrefix.'.json';
         }
-        return $this->credentialsPathPrefix .
-            '/' .
-            $this->credentialsFilePrefix .
-            '-' .
-            $userId .
+
+        return $this->credentialsPathPrefix.
+            '/'.
+            $this->credentialsFilePrefix.
+            '-'.
+            $userId.
             '.json';
     }
 }
