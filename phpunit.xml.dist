@@ -21,11 +21,14 @@
         </testsuite>
     </testsuites>
     <logging>
-        <junit outputFile="build/report.junit.xml"/>
+        <junit outputFile="build/report.junit.xml" />
     </logging>
     <source>
         <include>
             <directory suffix=".php">./src</directory>
         </include>
     </source>
+    <php>
+        <env name="APP_KEY" value="base64:Hl+jdJInFJG+M2VdKSzM6KbJlvy4N6F61ROi22GdqDk=" />
+    </php>
 </phpunit>
