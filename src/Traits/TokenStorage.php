@@ -9,8 +9,7 @@ trait TokenStorage
     /**
      * Path to the token folder.
      *
-     * @var string
-     *
+     * @param string $filePath
      * @return bool
      */
     protected function isCredentialsFileExists($filePath)
@@ -22,16 +21,30 @@ trait TokenStorage
      * Parse the json data from the file.
      *
      * @param  string  $filePath
-     * @return array<string, mixed>|null
+     * @return array<string, mixed>
      */
-    private function parseJsonDataFromFile($filePath)
+    private function parseJsonDataFromFile($filePath, $encrypt = true)
     {
-        if (! $this->isCredentialsFileExists($filePath)) {
-            return null;
-        }
-        $content = decrypt(Storage::disk('local')->get($filePath));
+        $defaultReturn = [
+            'accounts' => [],
+            'default_account' => null,
+        ];
+        try {
+            if (!$this->isCredentialsFileExists($filePath)) {
+                return $defaultReturn;
+            }
 
-        return json_decode($content, true);
+            $read = Storage::disk('local')->get($filePath);
+            $content = $encrypt ? decrypt($read) : $read;
+
+            $content = json_decode($content, true);
+            if (!is_array($content)) {
+                return $defaultReturn;
+            }
+            return $content;
+        } catch (\Exception $error) {
+            return $defaultReturn;
+        }
     }
 
     /**
@@ -39,12 +52,12 @@ trait TokenStorage
      *
      * @param  string  $filePath
      * @param  array<string, mixed>  $data
-     * @return void
+     * @return bool
      */
-    private function saveJsonDataToFile($filePath, $data)
+    private function saveJsonDataToFile($filePath, $data, $encrypt = true)
     {
         $content = json_encode($data);
-        Storage::disk('local')->put($filePath, encrypt($content));
+        return Storage::disk('local')->put($filePath, $encrypt ? encrypt($content) : $content);
     }
 
     /**
@@ -55,7 +68,7 @@ trait TokenStorage
      */
     private function deleteFile($filePath)
     {
-        if (! $this->isCredentialsFileExists($filePath)) {
+        if (!$this->isCredentialsFileExists($filePath)) {
             return true;
         }
 

@@ -2,6 +2,8 @@
 
 namespace Skn036\Google\Traits;
 
+use Skn036\Google\constants\StaticMessages;
+
 trait Configurable
 {
     /**
@@ -9,7 +11,7 @@ trait Configurable
      *
      * @var string
      */
-    protected $credentialsPathPrefix = storage_path('app/google/credentials');
+    protected $credentialsStoragePath = 'google/credentials';
 
     /**
      * Prefix for the credentials file.
@@ -19,23 +21,35 @@ trait Configurable
     protected $credentialsFilePrefix = 'credentials';
 
     /**
+     * Default google scopes
+     *
+     * @var array<string>
+     */
+    protected $defaultScopes = [
+        'https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/userinfo.email',
+    ];
+
+    /**
      * Set the configuration of the from env file.
      *
+     * @param  array<string, mixed>|null  $config
      * @return array<string, mixed>
      *
      * @throws \Exception
      */
-    private function prepareEnvConfig()
+    private function prepareEnvConfig($config = null)
     {
-        if (empty(app('config')['google'])) {
-            throw new \Exception(
-                'Google config not set. Run `php artisan vendor:publish --provider="Skn036\Google\GoogleClientServiceProvider"` to publish the config file.'
-            );
+        if (!$config) {
+            if (empty(config()->get('google'))) {
+                throw new \Exception(StaticMessages::GOOGLE_CONFIG_NOT_SET);
+            }
+            $config = config()->get('google');
         }
-        $config = app('config')['google'];
+        $config['scopes'] = array_merge($this->defaultScopes, $config['scopes'] ?? []);
 
-        foreach (['project_id', 'client_id', 'client_secret', 'redirect_uri', 'scopes'] as $key) {
-            if (! $this->isConfigValueAvailable($config, $key)) {
+        foreach (['client_id', 'client_secret', 'redirect_uri', 'scopes'] as $key) {
+            if (!$this->isConfigValueAvailable($config, $key)) {
                 throw new \Exception("Google $key is not set on the env file.");
             }
         }
@@ -56,6 +70,7 @@ trait Configurable
             'client_secret' => $envConfig['client_secret'],
             'redirect_uri' => $envConfig['redirect_uri'],
             'scopes' => $envConfig['scopes'],
+            'access_type' => 'offline',
         ];
 
         if ($envConfig['application_name']) {
@@ -78,7 +93,7 @@ trait Configurable
             return $key($config);
         }
 
-        return ! empty($config[$key]);
+        return !empty($config[$key]);
     }
 
     /**
@@ -90,15 +105,15 @@ trait Configurable
      */
     private function setCredentialsFilePath($envConfig, $userId)
     {
-        if (empty($envConfig['credentials_per_user']) || ! $userId) {
-            return $this->credentialsPathPrefix.'/'.$this->credentialsFilePrefix.'.json';
+        if (empty($envConfig['credentials_per_user']) || !$userId) {
+            return $this->credentialsStoragePath . '/' . $this->credentialsFilePrefix . '.json';
         }
 
-        return $this->credentialsPathPrefix.
-            '/'.
-            $this->credentialsFilePrefix.
-            '-'.
-            $userId.
+        return $this->credentialsStoragePath .
+            '/' .
+            $this->credentialsFilePrefix .
+            '-' .
+            $userId .
             '.json';
     }
 }
