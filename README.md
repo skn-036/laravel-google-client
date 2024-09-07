@@ -31,7 +31,7 @@ php artisan vendor:publish --provider="Skn036\Google\GoogleClientServiceProvider
 
 ## Configuration
 
-Please look into config/google.php for detailed information about the configuration. First you need to enabled the required api services and generate credentials in your google developers account. Please [see here](https://console.cloud.google.com/apis/credentials/oauthclient) from detailed instructions. Available .env variables for configuration are:
+Please look into config/google.php for detailed information about the configuration. First you need to enable the required api services and generate credentials in your google developers account. Please [see here](https://console.cloud.google.com/apis/credentials/oauthclient) from detailed instructions. Available .env variables for configuration are:
 
 ```env
 GOOGLE_APPLICATION_NAME=
@@ -160,7 +160,7 @@ $googleClient = new GoogleClient(1, 'foo@gmail.com');
 
 ## Extending This Package To Google Api Services
 
-First you should make a api service class extending the GoogleClient class. Then bind the it to the api services to interact with the api.
+First you should make a api service class extending the GoogleClient class. Then bind it to the api services to interact with the api.
 
 For example we will extend to the `Gmail api` service:
 
