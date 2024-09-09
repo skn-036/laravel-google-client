@@ -17,7 +17,7 @@ For extending your own api service please follow the guidelines [below](#extendi
 
 ## Installation
 
-First install the package using composer
+First install the package via composer
 
 ```bash
 composer require skn036/laravel-google-client
