@@ -113,4 +113,22 @@ return [
     |
     */
     'pub_sub_topic' => env('GOOGLE_PUB_SUB_TOPIC'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | skn036/laravel-gmail-api Configuration (ignore if not using)
+    |--------------------------------------------------------------------------
+    |
+    */
+    'gmail' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Attachment saving path
+        |--------------------------------------------------------------------------
+        |
+        | Should be given relative to the storage path.
+        |
+        */
+        'attachment_path' => 'app/gmail-attachments',
+    ],
 ];

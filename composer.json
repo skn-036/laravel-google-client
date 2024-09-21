@@ -1,6 +1,6 @@
 {
     "name": "skn036/laravel-google-client",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Wrapper for Google API Client Library for Laravel",
     "keywords": [
         "Muhammad Sajedul Karim",
