@@ -1,16 +1,10 @@
 # Wrapper Around Google Client For Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/skn-036/laravel-google-client.svg?style=flat-square)](https://packagist.org/packages/skn-036/laravel-google-client)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/skn-036/laravel-google-client/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/skn-036/laravel-google-client/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/skn-036/laravel-google-client.svg?style=flat-square)](https://packagist.org/packages/skn-036/laravel-google-client)
-
-<!-- [![Monthly Downloads](https://poser.pugx.org/skn-036/laravel-google-client/d/monthly)](https://packagist.org/packages/skn-036/laravel-google-client) -->
-
 This package only handles the authentication layer, securely saving, retrieving and revoking tokens around [google api client](https://github.com/googleapis/google-api-php-client). So it could be a good choice as authentication layer while using any api service from google.
 
 For some common api services from google please check:
 
-Gmail Api: [skn036/laravel-gmail-api (coming soon)](#)<br>
+Gmail Api: [skn036/laravel-gmail-api](https://github.com/skn-036/laravel-gmail-api)<br>
 Calendar Api: [skn036/laravel-google-calendar (coming soon)](#)
 
 For extending your own api service please follow the guidelines [below](#extending-this-package-to-google-api-services).
@@ -108,6 +102,8 @@ Route::get('/google-auth-callback', function (Request $request) {
 </div>
 ```
 
+## SPA Authentication
+
 If you are using SPA frontend like `React` or `Vue` and entirely handle the Oauth redirect in the frontend, you should call the getAuthUrl method to get the google Oauth url.
 
 ```php
@@ -121,15 +117,15 @@ After successful login from google, it should add `code` route query param on re
 $token = $googleClient->authenticate($request->code);
 ```
 
-### Single Account Per User Mode:
+## Single Account Per User Mode:
 
-By default, authenticated user is passed to `GoogleClient` instance using laravel's `auth()->id()`. If user is not authenticated it will throw a `\Exception` in that case. If you want to pass a user manually to client instance:
+By default, authenticated user is passed to `GoogleClient` instance using laravel's `auth()->id()`. If you want to pass a user manually to client instance:
 
 ```php
 $googleClient = new GoogleClient(1); // pass the user's id
 ```
 
-### Multiple Account Per User Mode:
+## Multiple Account Per User Mode:
 
 When using multiple accounts, first account synced will be set as default account. If you want to change the default account, first get the available accounts:
 
@@ -152,7 +148,7 @@ Then you call `setDefaultAccount` method to change the default account.
 $googleClient = $googleClient->setDefaultAccount('foo@gmail.com');
 ```
 
-Normally in this mode, it will use the default account to interact with the services. If you want to use other account rather than the default, you should pass the email of the intended account as the second argument of the client constructor.
+Normally it will use the default account to interact with the services. If you want to use other account rather than the default, you should pass the email of the intended account as the second argument of the client constructor.
 
 ```php
 $googleClient = new GoogleClient(1, 'foo@gmail.com');
@@ -170,8 +166,11 @@ use YourNamespace\Gmail\GmailMessage;
 
 class Gmail extends GoogleClient
 {
-    public function __construct($userId = null, $usingAccount = null, $config = null)
-    {
+    public function __construct(
+        string|int|null $userId = null,
+        ?string $usingAccount = null,
+        ?array $config = null
+    ) {
         parent::__construct($userId, $usingAccount, $config);
     }
 
@@ -194,13 +193,13 @@ class GmailMessage
     protected $client;
     protected $params = [];
 
-    public function __construct($googleClient)
+    public function __construct(Gmail $gmail)
     {
-        $this->client = $googleClient;
-        $this->service = new \Google_Service_Gmail($googleClient); // initiate the gmail api service
+        $this->client = $gmail;
+        $this->service = new \Google_Service_Gmail($gmail); // initiate the gmail api service
     }
 
-    public function get($params = [])
+    public function list($params = [])
     {
         $params = array_merge($this->params, $params);
 
@@ -212,7 +211,7 @@ class GmailMessage
 Now you can get the gmail messages by
 
 ```php
-$mails = (new Gmail())->messages()->get();
+$mails = (new Gmail())->messages()->list();
 ```
 
 ## Tree Shaking Unused Google Services

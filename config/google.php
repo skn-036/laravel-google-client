@@ -126,9 +126,9 @@ return [
         | Attachment saving path
         |--------------------------------------------------------------------------
         |
-        | Should be given relative to the storage path.
+        | This path should be relative to the root of the filesystem disk in the filesystems.php config file.
         |
         */
-        'attachment_path' => 'app/gmail-attachments',
+        'attachment_path' => 'gmail-attachments',
     ],
 ];
